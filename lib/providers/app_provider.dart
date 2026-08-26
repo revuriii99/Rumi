@@ -3,6 +3,7 @@ import '../data/models/financial_profile_model.dart';
 import '../data/models/property_model.dart';
 import '../data/models/survey_journal_model.dart';
 import '../data/mock/mock_properties.dart';
+import '../data/models/financial_evaluation_result.dart';
 
 class AppProvider with ChangeNotifier {
   FinancialProfileModel? _userProfile;
