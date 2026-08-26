@@ -1,4 +1,5 @@
 import 'package:rumi/data/models/property_model.dart';
+// ignore: unused_import
 import 'package:flutter/material.dart';
 
 List<PropertyModel> mockProperties = [
