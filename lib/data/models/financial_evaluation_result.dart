@@ -38,7 +38,7 @@ class FinancialEvaluationResult {
   final double income;
   final double propertyPrice;
   final double totalExpenses;
-  final double housingRation;
+  final double housingRatio;
   final double breathingRoom;
   final double breathingRoomRatio;
   final FinancialStatus status;
@@ -47,7 +47,7 @@ class FinancialEvaluationResult {
     required this.income,
     required this.propertyPrice,
     required this.totalExpenses,
-    required this.housingRation,
+    required this.housingRatio,
     required this.breathingRoom,
     required this.breathingRoomRatio,
     required this.status,
@@ -75,7 +75,7 @@ class FinancialEvaluationResult {
       income: profile.income,
       propertyPrice: propertyPrice,
       totalExpenses: totalExpenses,
-      housingRation: housingRatio,
+      housingRatio: housingRatio,
       breathingRoom: breathingRoom,
       breathingRoomRatio: breathingRoomRatio,
       status: status,
