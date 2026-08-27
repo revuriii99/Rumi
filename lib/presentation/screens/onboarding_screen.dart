@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'auth_screen.dart'; // Import AuthScreen yang baru dibuat
+import 'auth_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -125,7 +125,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: Column(
                   children: [
-                    // Tombol Daftar -> Buka AuthScreen dalam mode Daftar
                     SizedBox(
                       width: double.infinity,
                       height: 48,
@@ -158,7 +157,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     ),
                     const SizedBox(height: 12),
 
-                    // Tombol Masuk -> Buka AuthScreen dalam mode Masuk
                     SizedBox(
                       width: double.infinity,
                       height: 48,
