@@ -25,6 +25,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'RUMI',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(useMaterial3: true),
       home: const SplashScreen(),
     );

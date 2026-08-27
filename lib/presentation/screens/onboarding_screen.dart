@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'auth_screen.dart'; // Import AuthScreen yang baru dibuat
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -21,10 +22,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           'Cari hunian pertama itu bikin deg-degan, kami tahu.\nRUMI temenin kamu dari awal sampai keputusan\nakhir, biar nggak salah pilih.',
     },
     {
-      'image': 'assets/images/maskotRumi.svg',
-      'title': 'Hitung Finansial\nTanpa Pusing',
+      'image': 'assets/images/maskotRumi2.svg',
+      'title': 'Selamat Datang di\nRumi!',
       'description':
-          'Sesuaikan budget hunian dengan kondisi dompetmu.\nDapatkan rekomendasi cerdas dan realistis.',
+          'Sebelum deal, cek dulu dampaknya ke dompetmu. RUMI hitung otomatis biar kamu nggak cuma lihat harga, tapi juga ruang napas keuanganmu.',
     },
   ];
 
@@ -124,11 +125,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: Column(
                   children: [
+                    // Tombol Daftar -> Buka AuthScreen dalam mode Daftar
                     SizedBox(
                       width: double.infinity,
                       height: 48,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const AuthScreen(isRegisterInitial: true),
+                            ),
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF241442),
                           foregroundColor: Colors.white,
@@ -147,11 +157,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
+
+                    // Tombol Masuk -> Buka AuthScreen dalam mode Masuk
                     SizedBox(
                       width: double.infinity,
                       height: 48,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const AuthScreen(isRegisterInitial: false),
+                            ),
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white.withOpacity(0.85),
                           foregroundColor: const Color(0xFF241442),
