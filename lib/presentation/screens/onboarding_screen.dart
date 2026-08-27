@@ -99,7 +99,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
               ),
 
-              // Indikator Dots
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(
