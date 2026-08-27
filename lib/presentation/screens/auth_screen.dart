@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../data/repositories/auth_repository.dart';
 import 'register_success_screen.dart';
+import 'financial_profile_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   final bool isRegisterInitial;
@@ -71,11 +72,9 @@ class _AuthScreenState extends State<AuthScreen> {
 
     try {
       if (isRegister) {
-        await _authRepository.register(
-          email: email,
-          password: password,
-          fullName: fullName,
-        );
+        await _authRepository
+            .register(email: email, password: password, fullName: fullName)
+            .timeout(const Duration(seconds: 10));
 
         if (!mounted) return;
 
@@ -86,7 +85,9 @@ class _AuthScreenState extends State<AuthScreen> {
           ),
         );
       } else {
-        await _authRepository.login(email: email, password: password);
+        await _authRepository
+            .login(email: email, password: password)
+            .timeout(const Duration(seconds: 10));
 
         if (!mounted) return;
 
@@ -94,6 +95,14 @@ class _AuthScreenState extends State<AuthScreen> {
           const SnackBar(
             content: Text('Berhasil masuk!'),
             backgroundColor: Colors.green,
+            duration: Duration(seconds: 1),
+          ),
+        );
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const FinancialProfileScreen(),
           ),
         );
       }
@@ -106,7 +115,7 @@ class _AuthScreenState extends State<AuthScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Terjadi kesalahan: ${e.toString()}'),
+          content: Text('Terjadi kesalahan / timeout: ${e.toString()}'),
           backgroundColor: Colors.redAccent,
         ),
       );
@@ -395,6 +404,9 @@ class _AuthScreenState extends State<AuthScreen> {
                                 onPressed: _isLoading ? null : _handleAuth,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF241442),
+                                  disabledBackgroundColor: const Color(
+                                    0xFF241442,
+                                  ),
                                   foregroundColor: Colors.white,
                                   elevation: 6,
                                   padding: const EdgeInsets.symmetric(
@@ -406,24 +418,20 @@ class _AuthScreenState extends State<AuthScreen> {
                                 ),
                                 child: _isLoading
                                     ? const SizedBox(
-                                        height: 20,
-                                        width: 20,
+                                        height: 18,
+                                        width: 18,
                                         child: CircularProgressIndicator(
                                           color: Colors.white,
-                                          strokeWidth: 2,
+                                          strokeWidth: 2.5,
                                         ),
                                       )
-                                    : AnimatedSwitcher(
-                                        duration: const Duration(
-                                          milliseconds: 200,
-                                        ),
-                                        child: Text(
-                                          isRegister ? 'Daftar' : 'Masuk',
-                                          key: ValueKey<bool>(isRegister),
-                                          style: GoogleFonts.plusJakartaSans(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w700,
-                                          ),
+                                    : Text(
+                                        isRegister ? 'Daftar' : 'Masuk',
+                                        key: ValueKey<bool>(isRegister),
+                                        style: GoogleFonts.plusJakartaSans(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
+                                          color: Colors.white,
                                         ),
                                       ),
                               ),
