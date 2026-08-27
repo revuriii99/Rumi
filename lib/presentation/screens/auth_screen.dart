@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../data/repositories/auth_repository.dart';
 import 'register_success_screen.dart';
-import 'financial_profile_screen.dart';
+import 'main_navigation_screen.dart'; // Import Main Navigation
 
 class AuthScreen extends StatefulWidget {
   final bool isRegisterInitial;
@@ -91,19 +91,11 @@ class _AuthScreenState extends State<AuthScreen> {
 
         if (!mounted) return;
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Berhasil masuk!'),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 1),
-          ),
-        );
-
-        Navigator.pushReplacement(
+        // Navigasi langsung ke Home Screen / Main Navigation
+        Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(
-            builder: (context) => const FinancialProfileScreen(),
-          ),
+          MaterialPageRoute(builder: (context) => const MainNavigationScreen()),
+          (route) => false,
         );
       }
     } on AuthException catch (e) {
