@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../data/repositories/auth_repository.dart';
+import 'register_success_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   final bool isRegisterInitial;
@@ -14,6 +17,9 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen> {
   late bool isRegister;
   bool _obscurePassword = true;
+  bool _isLoading = false;
+
+  final AuthRepository _authRepository = AuthRepository();
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -36,6 +42,81 @@ class _AuthScreenState extends State<AuthScreen> {
     super.dispose();
   }
 
+  Future<void> _handleAuth() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+    final fullName = _nameController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Email dan kata sandi wajib diisi!'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
+    if (isRegister && fullName.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Nama lengkap wajib diisi!'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      if (isRegister) {
+        await _authRepository.register(
+          email: email,
+          password: password,
+          fullName: fullName,
+        );
+
+        if (!mounted) return;
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const RegisterSuccessScreen(),
+          ),
+        );
+      } else {
+        await _authRepository.login(email: email, password: password);
+
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Berhasil masuk!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } on AuthException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message), backgroundColor: Colors.redAccent),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Terjadi kesalahan: ${e.toString()}'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final Color textColor = isRegister
@@ -56,15 +137,12 @@ class _AuthScreenState extends State<AuthScreen> {
       backgroundColor: const Color(0xFF6A4CE5),
       body: Stack(
         children: [
-          // 1. Background Ilustrasi Full
           Positioned.fill(
             child: Image.asset(
               'assets/images/background.png',
               fit: BoxFit.cover,
             ),
           ),
-
-          // 2. Konten Tengah yang Rapat & Presisi
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
@@ -75,7 +153,6 @@ class _AuthScreenState extends State<AuthScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Judul RUMI
                       Text(
                         'Rumi',
                         style: GoogleFonts.plusJakartaSans(
@@ -86,7 +163,6 @@ class _AuthScreenState extends State<AuthScreen> {
                         ),
                       ),
                       const SizedBox(height: 6),
-                      // Tagline RUMI
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Text(
@@ -100,10 +176,7 @@ class _AuthScreenState extends State<AuthScreen> {
                           ),
                         ),
                       ),
-                      // Jarak presisi yang lebih dekat ke kartu form sesuai Figma
                       const SizedBox(height: 28),
-
-                      // 3. Card Box Form
                       Stack(
                         alignment: Alignment.bottomCenter,
                         clipBehavior: Clip.none,
@@ -113,7 +186,6 @@ class _AuthScreenState extends State<AuthScreen> {
                             height: 380,
                             child: Stack(
                               children: [
-                                // Layer Belakang: SVG Masuk
                                 Positioned.fill(
                                   child: TweenAnimationBuilder<Color?>(
                                     duration: const Duration(milliseconds: 300),
@@ -142,8 +214,6 @@ class _AuthScreenState extends State<AuthScreen> {
                                     },
                                   ),
                                 ),
-
-                                // Layer Depan: SVG Daftar
                                 Positioned.fill(
                                   child: TweenAnimationBuilder<Color?>(
                                     duration: const Duration(milliseconds: 300),
@@ -172,8 +242,6 @@ class _AuthScreenState extends State<AuthScreen> {
                                     },
                                   ),
                                 ),
-
-                                // Konten Form
                                 Padding(
                                   padding: const EdgeInsets.fromLTRB(
                                     28,
@@ -185,7 +253,6 @@ class _AuthScreenState extends State<AuthScreen> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      // Tab Header
                                       Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
@@ -209,8 +276,6 @@ class _AuthScreenState extends State<AuthScreen> {
                                         ],
                                       ),
                                       const SizedBox(height: 20),
-
-                                      // Field Nama Lengkap
                                       AnimatedSize(
                                         duration: const Duration(
                                           milliseconds: 250,
@@ -234,8 +299,6 @@ class _AuthScreenState extends State<AuthScreen> {
                                               )
                                             : const SizedBox.shrink(),
                                       ),
-
-                                      // Field Email
                                       _buildInputField(
                                         controller: _emailController,
                                         label: 'Email',
@@ -249,8 +312,6 @@ class _AuthScreenState extends State<AuthScreen> {
                                         dividerColor: dividerColor,
                                       ),
                                       const SizedBox(height: 12),
-
-                                      // Field Kata Sandi
                                       _buildInputField(
                                         controller: _passwordController,
                                         label: 'Kata Sandi',
@@ -270,8 +331,6 @@ class _AuthScreenState extends State<AuthScreen> {
                                         },
                                       ),
                                       const Spacer(),
-
-                                      // Switch Masuk / Daftar Link
                                       Center(
                                         child: AnimatedSwitcher(
                                           duration: const Duration(
@@ -328,14 +387,12 @@ class _AuthScreenState extends State<AuthScreen> {
                               ],
                             ),
                           ),
-
-                          // Tombol Submit Pill
                           Positioned(
                             bottom: -22,
                             child: SizedBox(
                               height: 46,
                               child: ElevatedButton(
-                                onPressed: () {},
+                                onPressed: _isLoading ? null : _handleAuth,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF241442),
                                   foregroundColor: Colors.white,
@@ -347,17 +404,28 @@ class _AuthScreenState extends State<AuthScreen> {
                                     borderRadius: BorderRadius.circular(24),
                                   ),
                                 ),
-                                child: AnimatedSwitcher(
-                                  duration: const Duration(milliseconds: 200),
-                                  child: Text(
-                                    isRegister ? 'Daftar' : 'Masuk',
-                                    key: ValueKey<bool>(isRegister),
-                                    style: GoogleFonts.plusJakartaSans(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                ),
+                                child: _isLoading
+                                    ? const SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : AnimatedSwitcher(
+                                        duration: const Duration(
+                                          milliseconds: 200,
+                                        ),
+                                        child: Text(
+                                          isRegister ? 'Daftar' : 'Masuk',
+                                          key: ValueKey<bool>(isRegister),
+                                          style: GoogleFonts.plusJakartaSans(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ),
                               ),
                             ),
                           ),
