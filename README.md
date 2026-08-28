@@ -36,7 +36,7 @@
 | Application Type | Mobile Application |
 | Primary Platform | Cross-platform (Android & iOS) |
 
-Rumi adalah aplikasi mobile pencarian dan evaluasi hunian cerdas yang membantu pengguna—khususnya dewasa muda usia 20-an yang sedang mencari hunian pertama—menemukan rumah sewa atau beli yang sesuai dengan kapasitas keuangan mereka, lewat perjalanan Learn → Discover → Evaluate → Inspect → Decide.
+Rumi adalah aplikasi mobile pencarian dan evaluasi hunian cerdas yang membantu pengguna khususnya dewasa muda usia 20-an yang sedang mencari hunian pertama,menemukan rumah sewa atau beli yang sesuai dengan kapasitas keuangan mereka, lewat perjalanan Learn → Discover → Evaluate → Inspect → Decide.
 
 ## Key features
 
