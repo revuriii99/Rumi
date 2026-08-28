@@ -5,15 +5,28 @@ class ProfileRepository {
   final _supabase = Supabase.instance.client;
 
   String? get currentUserId => _supabase.auth.currentUser?.id;
+  String? get currentUserEmail => _supabase.auth.currentUser?.email;
 
-  Future<Map<String, dynamic>?> getProfile() async {
-    if (currentUserId == null) return null;
+  Future<Map<String, dynamic>> getProfile() async {
+    if (currentUserId == null) return {};
+
     final res = await _supabase
         .from('profiles')
         .select()
         .eq('id', currentUserId!)
         .maybeSingle();
-    return res;
+
+    if (res != null) {
+      return Map<String, dynamic>.from(res);
+    }
+
+    return {
+      'full_name': _supabase.auth.currentUser?.userMetadata?['full_name'] ?? '',
+      'username': '',
+      'email': currentUserEmail ?? '',
+      'dob': '',
+      'avatar_url': null,
+    };
   }
 
   Future<void> updateProfile({
@@ -22,15 +35,15 @@ class ProfileRepository {
     required String dob,
   }) async {
     if (currentUserId == null) return;
-    await _supabase
-        .from('profiles')
-        .update({
-          'full_name': fullName,
-          'username': username,
-          'dob': dob,
-          'updated_at': DateTime.now().toIso8601String(),
-        })
-        .eq('id', currentUserId!);
+
+    await _supabase.from('profiles').upsert({
+      'id': currentUserId!,
+      'email': currentUserEmail,
+      'full_name': fullName,
+      'username': username,
+      'dob': dob,
+      'updated_at': DateTime.now().toIso8601String(),
+    });
   }
 
   Future<String?> uploadAvatar(File imageFile) async {
@@ -38,22 +51,23 @@ class ProfileRepository {
     final fileExt = imageFile.path.split('.').last;
     final fileName =
         '$currentUserId-${DateTime.now().millisecondsSinceEpoch}.$fileExt';
-    final filePath = fileName;
 
     await _supabase.storage
         .from('avatars')
         .upload(
-          filePath,
+          fileName,
           imageFile,
           fileOptions: const FileOptions(upsert: true),
         );
 
-    final imageUrl = _supabase.storage.from('avatars').getPublicUrl(filePath);
+    final imageUrl = _supabase.storage.from('avatars').getPublicUrl(fileName);
 
-    await _supabase
-        .from('profiles')
-        .update({'avatar_url': imageUrl})
-        .eq('id', currentUserId!);
+    await _supabase.from('profiles').upsert({
+      'id': currentUserId!,
+      'email': currentUserEmail,
+      'avatar_url': imageUrl,
+      'updated_at': DateTime.now().toIso8601String(),
+    });
 
     return imageUrl;
   }

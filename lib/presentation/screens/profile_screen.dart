@@ -1,286 +1,246 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../data/repositories/profile_repository.dart';
+import 'profile_dialogs.dart';
 import 'edit_profile_screen.dart';
 import 'change_password_screen.dart';
 import 'financial_profile_screen.dart';
 import 'saved_housing_screen.dart';
 import 'auth_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
-  Future<bool?> _showLogoutDialog(BuildContext context) {
-    return showDialog<bool>(
-      context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        backgroundColor: const Color(0xFFFDECE6),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Image.asset(
-                'assets/images/rumiMikir.png',
-                height: 110,
-                fit: BoxFit.contain,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Keluar Akun?',
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                  color: const Color(0xFF241442),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Apakah kamu yakin ingin keluar dari akun Rumi?',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                  color: const Color(0xFF555555),
-                  height: 1.4,
-                ),
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: SizedBox(
-                      height: 42,
-                      child: ElevatedButton(
-                        onPressed: () => Navigator.pop(context, true),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFD32F2F),
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
-                        child: Text(
-                          'Keluar',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: SizedBox(
-                      height: 42,
-                      child: ElevatedButton(
-                        onPressed: () => Navigator.pop(context, false),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFB5A4DD),
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
-                        child: Text(
-                          'Batal',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final ProfileRepository _repo = ProfileRepository();
+  Map<String, dynamic> _profileData = {};
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    final data = await _repo.getProfile();
+    if (mounted) {
+      setState(() {
+        _profileData = data;
+        _isLoading = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final String fullName = _profileData['full_name']?.isNotEmpty == true
+        ? _profileData['full_name']
+        : 'Pengguna Rumi';
+    final String username = _profileData['username']?.isNotEmpty == true
+        ? '@${_profileData['username'].replaceAll('@', '')}'
+        : '@rumi_user';
+    final String email = _profileData['email']?.isNotEmpty == true
+        ? _profileData['email']
+        : (Supabase.instance.client.auth.currentUser?.email ?? '');
+    final String? avatarUrl = _profileData['avatar_url'];
+
     return Scaffold(
       backgroundColor: const Color(0xFFD8CAF6),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
-          children: [
-            Row(
-              children: [
-                const Icon(
-                  Icons.person_outline_rounded,
-                  color: Color(0xFF241442),
-                  size: 26,
+        child: _isLoading
+            ? const Center(
+                child: CircularProgressIndicator(color: Color(0xFF43187A)),
+              )
+            : ListView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20.0,
+                  vertical: 12.0,
                 ),
-                const SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Profil',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        color: const Color(0xFF241442),
-                      ),
-                    ),
-                    Text(
-                      'Kelola informasi akun anda',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w400,
-                        color: const Color(0xFF555555),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 28),
-
-            Center(
-              child: Column(
                 children: [
-                  Container(
-                    width: 86,
-                    height: 86,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: const Color(0xFF7E57C2),
-                        width: 3,
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.person_outline_rounded,
+                        color: Color(0xFF241442),
+                        size: 26,
                       ),
-                      image: const DecorationImage(
-                        image: AssetImage('assets/images/logoRumi.png'),
-                        fit: BoxFit.cover,
+                      const SizedBox(width: 10),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Profil',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              color: const Color(0xFF241442),
+                            ),
+                          ),
+                          Text(
+                            'Kelola informasi akun anda',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w400,
+                              color: const Color(0xFF555555),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 28),
+
+                  Center(
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 86,
+                          height: 86,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: const Color(0xFF7E57C2),
+                              width: 3,
+                            ),
+                            image: avatarUrl != null
+                                ? DecorationImage(
+                                    image: NetworkImage(avatarUrl),
+                                    fit: BoxFit.cover,
+                                  )
+                                : const DecorationImage(
+                                    image: AssetImage(
+                                      'assets/images/logoRumi.png',
+                                    ),
+                                    fit: BoxFit.cover,
+                                  ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          fullName,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFF241442),
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '$username\n$email',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: const Color(0xFF555555),
+                            height: 1.3,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 26),
+
+                  _buildMenuTile(
+                    icon: Icons.edit_note_rounded,
+                    title: 'Edit Profil',
+                    subtitle: 'Ubah nama dan email',
+                    onTap: () async {
+                      final updated = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const EditProfileScreen(),
+                        ),
+                      );
+                      if (updated == true) _loadData();
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                  _buildMenuTile(
+                    icon: Icons.lock_outline_rounded,
+                    title: 'Ubah Password',
+                    subtitle: 'Ubah kata sandi',
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ChangePasswordScreen(),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Tjok o Wie',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      color: const Color(0xFF241442),
+                  const SizedBox(height: 10),
+                  _buildMenuTile(
+                    icon: Icons.bar_chart_rounded,
+                    title: 'Profil Finansial',
+                    subtitle: 'Update data keuanganmu',
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const FinancialProfileScreen(),
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '@parapencarirumah\nparapencarirumah666@gmail.com',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                      color: const Color(0xFF555555),
-                      height: 1.3,
+                  const SizedBox(height: 10),
+                  _buildMenuTile(
+                    icon: Icons.bookmark_border_rounded,
+                    title: 'Hunian Tersimpan',
+                    subtitle: 'Lihat hunian impian yang kamu simpan',
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SavedHousingScreen(),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        final bool? confirm = await showLogoutDialog(context);
+                        if (confirm == true) {
+                          await Supabase.instance.client.auth.signOut();
+                          if (context.mounted) {
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const AuthScreen(),
+                              ),
+                              (route) => false,
+                            );
+                          }
+                        }
+                      },
+                      icon: const Icon(
+                        Icons.logout_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      label: Text(
+                        'Keluar Akun',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFF4261A),
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
                     ),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 26),
-
-            _buildMenuTile(
-              icon: Icons.edit_note_rounded,
-              title: 'Edit Profil',
-              subtitle: 'Ubah nama dan email',
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const EditProfileScreen(),
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            _buildMenuTile(
-              icon: Icons.lock_outline_rounded,
-              title: 'Ubah Password',
-              subtitle: 'Ubah kata sandi',
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ChangePasswordScreen(),
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            _buildMenuTile(
-              icon: Icons.bar_chart_rounded,
-              title: 'Profil Finansial',
-              subtitle: 'Update data keuanganmu',
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const FinancialProfileScreen(),
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            _buildMenuTile(
-              icon: Icons.bookmark_border_rounded,
-              title: 'Hunian Tersimpan',
-              subtitle: 'Lihat hunian impian yang kamu simpan',
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const SavedHousingScreen(),
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton.icon(
-                onPressed: () async {
-                  final bool? confirm = await _showLogoutDialog(context);
-                  if (confirm == true) {
-                    await Supabase.instance.client.auth.signOut();
-                    if (context.mounted) {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AuthScreen(),
-                        ),
-                        (route) => false,
-                      );
-                    }
-                  }
-                },
-                icon: const Icon(
-                  Icons.logout_rounded,
-                  color: Colors.white,
-                  size: 20,
-                ),
-                label: Text(
-                  'Keluar Akun',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFF4261A),
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
