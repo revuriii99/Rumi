@@ -1,8 +1,8 @@
 class SurveyJournalStore {
-  static final List<Map<String, String>> journals = [];
+  static final List<Map<String, dynamic>> journals = [];
 
-  static void addJournal(Map<String, String> item) {
-    journals.insert(0, item);
+  static void addJournal(Map<String, dynamic> journal) {
+    journals.insert(0, journal);
   }
 
   static void deleteJournal(int index) {
