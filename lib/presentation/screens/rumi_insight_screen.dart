@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/app_page_route.dart';
 import '../../data/mock/survey_journal_store.dart';
 import 'rumi_insight_detail_screen.dart';
 import 'select_housing_survey_screen.dart';
@@ -15,7 +16,7 @@ class RumiInsightScreen extends StatefulWidget {
 
 class _RumiInsightScreenState extends State<RumiInsightScreen> {
   late bool _isBelajarTab;
-  int _selectedCategory = 0;
+  int _selectedCategoryIndex = 0;
 
   final List<String> _categories = [
     'Semua',
@@ -24,7 +25,7 @@ class _RumiInsightScreenState extends State<RumiInsightScreen> {
     'Keuangan',
   ];
 
-  final List<Map<String, String>> _modules = [
+  final List<Map<String, String>> _allModules = [
     {
       'title': 'KPR Tanpa Bikin Pusing Keliling',
       'desc':
@@ -35,10 +36,25 @@ class _RumiInsightScreenState extends State<RumiInsightScreen> {
     },
     {
       'title': 'Nabung Buat DP, Bukan Nahan Ngopi',
-      'desc':
-          'Kenali KPR, DP, bunga, dan cicilan sebelum memutuskan membeli rumah.',
+      'desc': 'Kenali strategi tabungan dan dana awal untuk hunian impianmu.',
       'category': 'Mencari Hunian',
       'readTime': '3 menit baca',
+      'image': 'assets/images/kpr2.png',
+    },
+    {
+      'title': 'Dompet Aman, Tidur Nyenyak',
+      'desc':
+          'Hitung rasio pengeluaran hunian agar keuangan bulanan tetap sehat.',
+      'category': 'Keuangan',
+      'readTime': '4 menit baca',
+      'image': 'assets/images/kpr1.png',
+    },
+    {
+      'title': 'Jodoh-Jodohan Sama Hunian',
+      'desc':
+          'Tips memilih lokasi, akses transportasi, dan lingkungan hunian tepat.',
+      'category': 'Mencari Hunian',
+      'readTime': '2 menit baca',
       'image': 'assets/images/kpr2.png',
     },
   ];
@@ -49,12 +65,18 @@ class _RumiInsightScreenState extends State<RumiInsightScreen> {
     _isBelajarTab = !widget.initialTabJurnal;
   }
 
+  List<Map<String, String>> get _filteredModules {
+    if (_selectedCategoryIndex == 0) {
+      return _allModules;
+    }
+    final selectedCategory = _categories[_selectedCategoryIndex];
+    return _allModules.where((m) => m['category'] == selectedCategory).toList();
+  }
+
   Future<void> _navigateToNewJournal() async {
     await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const SelectHousingSurveyScreen(),
-      ),
+      SmoothPageRoute(page: const SelectHousingSurveyScreen()),
     );
 
     setState(() {
@@ -170,7 +192,9 @@ class _RumiInsightScreenState extends State<RumiInsightScreen> {
                     Expanded(
                       child: GestureDetector(
                         onTap: () => setState(() => _isBelajarTab = true),
-                        child: Container(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 250),
+                          curve: Curves.easeInOut,
                           padding: const EdgeInsets.symmetric(vertical: 8),
                           decoration: BoxDecoration(
                             color: _isBelajarTab
@@ -194,7 +218,9 @@ class _RumiInsightScreenState extends State<RumiInsightScreen> {
                     Expanded(
                       child: GestureDetector(
                         onTap: () => setState(() => _isBelajarTab = false),
-                        child: Container(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 250),
+                          curve: Curves.easeInOut,
                           padding: const EdgeInsets.symmetric(vertical: 8),
                           decoration: BoxDecoration(
                             color: !_isBelajarTab
@@ -222,9 +248,12 @@ class _RumiInsightScreenState extends State<RumiInsightScreen> {
             const SizedBox(height: 14),
 
             Expanded(
-              child: _isBelajarTab
-                  ? _buildBelajarContent()
-                  : _buildJurnalContent(),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                child: _isBelajarTab
+                    ? _buildBelajarContent()
+                    : _buildJurnalContent(),
+              ),
             ),
           ],
         ),
@@ -233,20 +262,24 @@ class _RumiInsightScreenState extends State<RumiInsightScreen> {
   }
 
   Widget _buildBelajarContent() {
+    final displayedList = _filteredModules;
+
     return ListView(
+      key: const ValueKey('BelajarContent'),
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       children: [
         SizedBox(
-          height: 34,
+          height: 36,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: _categories.length,
             separatorBuilder: (context, index) => const SizedBox(width: 8),
             itemBuilder: (context, index) {
-              final isSelected = _selectedCategory == index;
+              final isSelected = _selectedCategoryIndex == index;
               return GestureDetector(
-                onTap: () => setState(() => _selectedCategory = index),
-                child: Container(
+                onTap: () => setState(() => _selectedCategoryIndex = index),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 6,
@@ -275,120 +308,137 @@ class _RumiInsightScreenState extends State<RumiInsightScreen> {
           ),
         ),
         const SizedBox(height: 16),
-        ..._modules.map((m) {
-          return Container(
-            margin: const EdgeInsets.only(bottom: 16),
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFDECE6),
-              borderRadius: BorderRadius.circular(20),
+
+        if (displayedList.isEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 40.0),
+            child: Center(
+              child: Text(
+                'Belum ada modul di kategori ini.',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF555555),
+                ),
+              ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Image.asset(
-                    m['image']!,
-                    height: 140,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
+          )
+        else
+          ...displayedList.map((m) {
+            return Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFDECE6),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.asset(
+                      m['image']!,
+                      height: 140,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  m['title']!,
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w800,
-                    color: const Color(0xFF241442),
+                  const SizedBox(height: 12),
+                  Text(
+                    m['title']!,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xFF241442),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  m['desc']!,
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w400,
-                    color: const Color(0xFF555555),
+                  const SizedBox(height: 4),
+                  Text(
+                    m['desc']!,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w400,
+                      color: const Color(0xFF555555),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 3,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFB5A4DD),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        m['category']!,
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 9.5,
-                          fontWeight: FontWeight.w700,
-                          color: const Color(0xFF241442),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
                         ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    const Icon(
-                      Icons.access_time_rounded,
-                      size: 13,
-                      color: Color(0xFF555555),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      m['readTime']!,
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xFF555555),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  height: 38,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => RumiInsightDetailScreen(
-                            title: m['title']!,
-                            category: m['category']!,
-                            readTime: m['readTime']!,
-                            imagePath: m['image']!,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFB5A4DD),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          m['category']!,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF241442),
                           ),
                         ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2B124C),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
                       ),
-                    ),
-                    child: Text(
-                      'Baca',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
+                      const SizedBox(width: 8),
+                      const Icon(
+                        Icons.access_time_rounded,
+                        size: 13,
+                        color: Color(0xFF555555),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        m['readTime']!,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF555555),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 38,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          SmoothPageRoute(
+                            page: RumiInsightDetailScreen(
+                              title: m['title']!,
+                              category: m['category']!,
+                              readTime: m['readTime']!,
+                              imagePath: m['image']!,
+                            ),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF2B124C),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                      ),
+                      child: Text(
+                        'Baca',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          );
-        }),
+                ],
+              ),
+            );
+          }),
+        const SizedBox(height: 16),
       ],
     );
   }
@@ -398,6 +448,7 @@ class _RumiInsightScreenState extends State<RumiInsightScreen> {
 
     if (list.isEmpty) {
       return Column(
+        key: const ValueKey('EmptyJurnal'),
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Row(
@@ -464,6 +515,7 @@ class _RumiInsightScreenState extends State<RumiInsightScreen> {
     }
 
     return ListView(
+      key: const ValueKey('ListJurnal'),
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       children: [
         Align(
@@ -505,9 +557,7 @@ class _RumiInsightScreenState extends State<RumiInsightScreen> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => SurveyDetailScreen(journal: j),
-                ),
+                SmoothPageRoute(page: SurveyDetailScreen(journal: j)),
               );
             },
             borderRadius: BorderRadius.circular(20),

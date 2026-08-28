@@ -6,6 +6,7 @@ import '../../data/repositories/profile_repository.dart';
 import 'financial_profile_screen.dart';
 import 'rumi_insight_screen.dart';
 import 'rumi_insight_detail_screen.dart';
+import '../../core/app_page_route.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -366,9 +367,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(
-                                builder: (context) => const RumiInsightScreen(),
-                              ),
+                              SmoothPageRoute(page: const RumiInsightScreen()),
                             );
                           },
                           child: Text(
