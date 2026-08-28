@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../screens/home_screen.dart';
-import '../screens/rumi_finder_screen.dart';
-import '../screens/profile_screen.dart';
+import 'home_screen.dart';
+import 'rumi_finder_screen.dart';
+import 'profile_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   final int initialIndex;

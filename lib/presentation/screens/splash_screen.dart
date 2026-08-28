@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'onboarding_screen.dart';
-import 'home_screen.dart';
+import 'main_navigation_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -59,10 +59,9 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward().then((_) {
       if (mounted) {
-        // Cek apakah ada sesi login aktif di Supabase
         final session = Supabase.instance.client.auth.currentSession;
-        final targetScreen = session != null
-            ? const HomeScreen() // Ganti ke nama class halaman utama kamu
+        final Widget targetScreen = session != null
+            ? const MainNavigationScreen()
             : const OnboardingScreen();
 
         Navigator.of(context).pushReplacement(
