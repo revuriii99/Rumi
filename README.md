@@ -108,9 +108,9 @@ To get a local copy up and running, follow these simple steps.
 
 ## Team
 
-| Name | Role | Responsibilities | Contact |
-| --- | --- | --- | --- |
-| Amelia Raisa | Product Manager | Merumuskan problem statement, solution, dan scope MVP, menyusun PRD & user flow, serta mengawasi timeline dan progres tim | LinkedIn |
-| Salsabila | UI/UX Designer | Merancang design system, wireframe, dan prototype high-fidelity di Figma | LinkedIn |
-| Scar | UI/UX Designer | Merancang design system, wireframe, dan prototype high-fidelity di Figma | LinkedIn |
-| Vincent (Revi) | Mobile Engineer | Mengembangkan antarmuka aplikasi, integrasi fitur RUMIFinder, kalkulasi Financial Breathing Room, dan konektivitas Supabase | [GitHub](https://github.com/revuriii99) |
+| Name                   | Role            | Responsibilities                                                                                                            | Contact                                                                                                   |
+| ---------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Amelia Raisa           | Product Manager | Merumuskan problem statement, solution, dan scope MVP, menyusun PRD & user flow, serta mengawasi timeline dan progres tim   | LinkedIn                                                                                                  |
+| Salsabila              | UI/UX Designer  | Merancang design system, wireframe, dan prototype high-fidelity di Figma                                                    | [LinkedIn](https://bit.ly/Salsabila-Safitri)                                                              |
+| Scar                   | UI/UX Designer  | Merancang design system, wireframe, dan prototype high-fidelity di Figma                                                    | [LinkedIn](https://www.linkedin.com/in/ascarya-haldis/)                                                   |
+| Vincentius Revi Wileri | Mobile Engineer | Mengembangkan antarmuka aplikasi, integrasi fitur RUMIFinder, kalkulasi Financial Breathing Room, dan konektivitas Supabase | [GitHub](https://github.com/revuriii99) · [LinkedIn](https://www.linkedin.com/in/vincentius-revi-wileri/) |
