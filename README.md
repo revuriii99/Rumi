@@ -1,6 +1,6 @@
 <div align="center">
 
-  <img src="docs/images/app-logo.png" alt="Rumi logo" width="180" />
+  <img src="assets/icons/app_icon.png" alt="Rumi logo" width="180" />
 
   <p align="center">
     <img src="docs/images/app-mockup.png" alt="Rumi mockup" width="100%" />
