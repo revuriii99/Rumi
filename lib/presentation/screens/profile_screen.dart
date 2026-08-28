@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../core/app_page_route.dart';
 import '../../data/repositories/profile_repository.dart';
 import 'profile_dialogs.dart';
 import 'edit_profile_screen.dart';
@@ -108,7 +109,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               color: const Color(0xFF7E57C2),
                               width: 3,
                             ),
-                            image: avatarUrl != null
+                            image: avatarUrl != null && avatarUrl.isNotEmpty
                                 ? DecorationImage(
                                     image: NetworkImage(avatarUrl),
                                     fit: BoxFit.cover,
@@ -153,9 +154,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     onTap: () async {
                       final updated = await Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => const EditProfileScreen(),
-                        ),
+                        SmoothPageRoute(page: const EditProfileScreen()),
                       );
                       if (updated == true) _loadData();
                     },
@@ -167,9 +166,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     subtitle: 'Ubah kata sandi',
                     onTap: () => Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => const ChangePasswordScreen(),
-                      ),
+                      SmoothPageRoute(page: const ChangePasswordScreen()),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -179,9 +176,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     subtitle: 'Update data keuanganmu',
                     onTap: () => Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => const FinancialProfileScreen(),
-                      ),
+                      SmoothPageRoute(page: const FinancialProfileScreen()),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -189,12 +184,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     icon: Icons.bookmark_border_rounded,
                     title: 'Hunian Tersimpan',
                     subtitle: 'Lihat hunian impian yang kamu simpan',
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const SavedHousingScreen(),
-                      ),
-                    ),
+                    onTap: () async {
+                      await Navigator.push(
+                        context,
+                        SmoothPageRoute(page: const SavedHousingScreen()),
+                      );
+                      setState(() {});
+                    },
                   ),
                   const SizedBox(height: 24),
 
@@ -209,9 +205,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           if (context.mounted) {
                             Navigator.pushAndRemoveUntil(
                               context,
-                              MaterialPageRoute(
-                                builder: (context) => const AuthScreen(),
-                              ),
+                              SmoothPageRoute(page: const AuthScreen()),
                               (route) => false,
                             );
                           }

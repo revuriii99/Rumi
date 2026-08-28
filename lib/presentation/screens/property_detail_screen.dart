@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../data/mock/housing_data.dart';
 
 class PropertyDetailScreen extends StatelessWidget {
-  const PropertyDetailScreen({super.key});
+  final HousingModel housing;
+
+  const PropertyDetailScreen({super.key, required this.housing});
+
+  String _formatPrice(int price) {
+    final str = price.toString().replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (m) => '${m[1]}.',
+    );
+    return 'Rp $str';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -10,22 +21,40 @@ class PropertyDetailScreen extends StatelessWidget {
       backgroundColor: const Color(0xFFD8CAF6),
       body: Stack(
         children: [
+          // Gambar Banner Hunian Asli Sesuai Data
           Positioned(
             top: 0,
             left: 0,
             right: 0,
-            height: 320,
-            child: Image.asset(
-              'assets/images/background.png',
-              fit: BoxFit.cover,
+            height: 330,
+            child: Image.asset(housing.image, fit: BoxFit.cover),
+          ),
+
+          // Gradient Overlay di atas gambar
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 330,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.black.withOpacity(0.4), Colors.transparent],
+                  stops: const [0.0, 0.4],
+                ),
+              ),
             ),
           ),
 
+          // Tombol Kembali
           Positioned(
             top: 48,
             left: 20,
             child: InkWell(
               onTap: () => Navigator.pop(context),
+              borderRadius: BorderRadius.circular(20),
               child: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: const BoxDecoration(
@@ -35,65 +64,51 @@ class PropertyDetailScreen extends StatelessWidget {
                 child: const Icon(
                   Icons.arrow_back_rounded,
                   color: Colors.white,
-                  size: 20,
+                  size: 22,
                 ),
               ),
             ),
           ),
 
-          Positioned.fill(
-            top: 250,
+          // Kontainer Detail Informasi Properti (Scrollable Bottom Card)
+          Positioned(
+            top: 260,
+            left: 0,
+            right: 0,
+            bottom: 0,
             child: Container(
               decoration: const BoxDecoration(
                 color: Color(0xFFFDECE6),
                 borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
               ),
               child: ListView(
-                padding: const EdgeInsets.all(24.0),
+                padding: const EdgeInsets.fromLTRB(24, 24, 24, 30),
                 children: [
+                  // Judul & Badge Tipe
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Rumah Kotak',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w800,
-                              color: const Color(0xFF241442),
-                            ),
+                      Expanded(
+                        child: Text(
+                          housing.title,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFF241442),
                           ),
-                          Text(
-                            'Kota Malang',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                              color: const Color(0xFF5A31E1),
-                            ),
-                          ),
-                          Text(
-                            'Jl. Veteran No.8A, Penanggungan, Kec. Klojen',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 10.5,
-                              fontWeight: FontWeight.w400,
-                              color: const Color(0xFF555555),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
+                          horizontal: 12,
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF43187A),
+                          color: const Color(0xFF2B124C),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          'Sewa',
+                          housing.type,
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
@@ -103,76 +118,77 @@ class PropertyDetailScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: RichText(
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text: 'Rp 15.000.000 ',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w800,
-                              color: const Color(0xFF241442),
-                            ),
-                          ),
-                          TextSpan(
-                            text: '/ Bulan',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
-                              color: const Color(0xFF555555),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const Divider(color: Color(0xFFE2D6EE), height: 28),
-
+                  const SizedBox(height: 3),
                   Text(
-                    'Deskripsi',
+                    housing.city,
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
+                      color: const Color(0xFF6B4EE6),
+                    ),
+                  ),
+                  Text(
+                    housing.address,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w400,
+                      color: const Color(0xFF6B6282),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    '${_formatPrice(housing.price)} / Bulan',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w800,
                       color: const Color(0xFF241442),
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const Divider(height: 28, color: Color(0xFFE8D4CC)),
+
+                  // Deskripsi
                   Text(
-                    'Rumah ini memiliki 3 kamar tidur yang luas, 2 kamar mandi modern, dan ruang tamu yang nyaman. Dilengkapi dengan dapur yang fungsional dan halaman belakang yang ideal untuk berkumpul. Terletak di kawasan strategis, dekat dengan pusat perbelanjaan dan sekolah. Cocok untuk keluarga yang mencari kenyamanan dan aksesibilitas.',
+                    'Deskripsi',
                     style: GoogleFonts.plusJakartaSans(
-                      fontSize: 10.5,
-                      fontWeight: FontWeight.w400,
-                      color: const Color(0xFF444444),
-                      height: 1.4,
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xFF241442),
                     ),
                   ),
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 6),
+                  Text(
+                    housing.desc,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w400,
+                      color: const Color(0xFF4A4260),
+                      height: 1.45,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
 
+                  // Spesifikasi Rumah
                   Text(
                     'Spesifikasi Rumah',
                     style: GoogleFonts.plusJakartaSans(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w800,
                       color: const Color(0xFF241442),
                     ),
                   ),
                   const SizedBox(height: 10),
-
-                  _buildSpecRow('Kamar Tidur', '3'),
-                  _buildSpecRow('Kamar Mandi', '2'),
-                  _buildSpecRow('Luas Tanah', '120 m²'),
-                  _buildSpecRow('Luas Bangunan', '100 m²'),
-                  _buildSpecRow('Tipe Properti', 'Rumah'),
-                  _buildSpecRow('Alamat', 'Jl. Veteran No.8A'),
-                  _buildSpecRow('Lokasi', 'Jawa Timur, Malang, Klojen'),
-                  _buildSpecRow('Listrik', '10.000 Watt'),
-                  _buildSpecRow('Sertifikat', 'Surat Hak Guna Bangun'),
-                  _buildSpecRow('Hadap', 'Timur'),
-                  _buildSpecRow('Furnished', 'Non - Furnished'),
-                  const SizedBox(height: 30),
+                  _buildSpecRow('Kamar Tidur', '${housing.bedroom}'),
+                  _buildSpecRow('Kamar Mandi', '${housing.bathroom}'),
+                  _buildSpecRow('Luas Tanah', '${housing.landArea} m²'),
+                  _buildSpecRow('Luas Bangunan', '${housing.buildingArea} m²'),
+                  _buildSpecRow('Tipe Properti', housing.propertyType),
+                  _buildSpecRow('Alamat', housing.address),
+                  _buildSpecRow('Lokasi', housing.locationDetail),
+                  _buildSpecRow('Listrik', housing.electricity),
+                  _buildSpecRow('Sertifikat', housing.certificate),
+                  _buildSpecRow('Hadap', housing.orientation),
+                  _buildSpecRow('Furnished', housing.furnished),
+                  const SizedBox(height: 16),
                 ],
               ),
             ),
@@ -184,29 +200,24 @@ class PropertyDetailScreen extends StatelessWidget {
 
   Widget _buildSpecRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      padding: const EdgeInsets.symmetric(vertical: 4.5),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
-            flex: 4,
-            child: Text(
-              label,
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 10.5,
-                fontWeight: FontWeight.w500,
-                color: const Color(0xFF555555),
-              ),
+          Text(
+            label,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 11.5,
+              fontWeight: FontWeight.w500,
+              color: const Color(0xFF6B6282),
             ),
           ),
-          Expanded(
-            flex: 6,
-            child: Text(
-              value,
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 10.5,
-                fontWeight: FontWeight.w700,
-                color: const Color(0xFF241442),
-              ),
+          Text(
+            value,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 11.5,
+              fontWeight: FontWeight.w700,
+              color: const Color(0xFF241442),
             ),
           ),
         ],

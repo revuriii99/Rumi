@@ -1,24 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/app_page_route.dart';
+import '../../data/mock/housing_data.dart';
 import 'property_detail_screen.dart';
 
-class SavedHousingScreen extends StatelessWidget {
+class SavedHousingScreen extends StatefulWidget {
   const SavedHousingScreen({super.key});
 
   @override
+  State<SavedHousingScreen> createState() => _SavedHousingScreenState();
+}
+
+class _SavedHousingScreenState extends State<SavedHousingScreen> {
+  String _formatPrice(int price) {
+    final str = price.toString().replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (m) => '${m[1]}.',
+    );
+    return 'Rp $str';
+  }
+
+  void _removeSavedItem(String id, String title) {
+    setState(() {
+      HousingDataStore.removeSavedHousing(id);
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          '$title dihapus dari tersimpan',
+          style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600),
+        ),
+        backgroundColor: const Color(0xFF2B124C),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final List<Map<String, String>> savedHouses = [
-      {
-        'title': 'Rumah Kotak',
-        'address': 'Jl. Veteran No.8A, Kota Malang',
-        'price': 'Rp 15.000.000 / bulan',
-      },
-      {
-        'title': 'Rumah Kotak',
-        'address': 'Jl. In aja dulu, Kota Malang',
-        'price': 'Rp 15.000.000 / bulan',
-      },
-    ];
+    final list = HousingDataStore.savedHousings;
 
     return Scaffold(
       backgroundColor: const Color(0xFFD8CAF6),
@@ -65,35 +86,36 @@ class SavedHousingScreen extends StatelessWidget {
                 ],
               ),
             ),
+            const SizedBox(height: 8),
 
             Expanded(
-              child: savedHouses.isEmpty
+              child: list.isEmpty
                   ? Center(
-                      child: Padding(
+                      child: SingleChildScrollView(
                         padding: const EdgeInsets.symmetric(horizontal: 24.0),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Image.asset(
                               'assets/images/rumiMikir.png',
-                              height: 180,
+                              height: 170,
                               fit: BoxFit.contain,
                             ),
-                            const SizedBox(height: 24),
+                            const SizedBox(height: 16),
                             Text(
-                              'Belum ada hunian disimpan',
+                              'Belum Ada Hunian Tersimpan',
                               style: GoogleFonts.plusJakartaSans(
-                                fontSize: 18,
+                                fontSize: 17,
                                 fontWeight: FontWeight.w800,
                                 color: const Color(0xFF5B2E91),
                               ),
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              'Pergi ke RumiFinder dan cari rumah impianmu!',
+                              'Swipe kanan hunian yang kamu suka di RumiFinder\nuntuk menyimpannya di sini!',
                               textAlign: TextAlign.center,
                               style: GoogleFonts.plusJakartaSans(
-                                fontSize: 12,
+                                fontSize: 11.5,
                                 fontWeight: FontWeight.w400,
                                 color: const Color(0xFF7E57C2),
                               ),
@@ -102,104 +124,125 @@ class SavedHousingScreen extends StatelessWidget {
                         ),
                       ),
                     )
-                  : ListView.separated(
+                  : ListView.builder(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 12,
+                        horizontal: 20.0,
+                        vertical: 8.0,
                       ),
-                      itemCount: savedHouses.length,
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(height: 14),
+                      itemCount: list.length,
                       itemBuilder: (context, index) {
-                        final house = savedHouses[index];
-                        return InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const PropertyDetailScreen(),
-                              ),
-                            );
-                          },
-                          borderRadius: BorderRadius.circular(20),
-                          child: Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFDECE6),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Row(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(14),
-                                  child: Image.asset(
-                                    'assets/images/background.png',
-                                    width: 76,
-                                    height: 76,
-                                    fit: BoxFit.cover,
-                                  ),
+                        final house = list[index];
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 14),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFDECE6),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                SmoothPageRoute(
+                                  page: PropertyDetailScreen(housing: house),
                                 ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                              );
+                            },
+                            borderRadius: BorderRadius.circular(20),
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Row(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(14),
+                                    child: Image.asset(
+                                      house.image,
+                                      width: 80,
+                                      height: 80,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 14),
+
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          house.title,
+                                          style: GoogleFonts.plusJakartaSans(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w800,
+                                            color: const Color(0xFF241442),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          house.address,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: GoogleFonts.plusJakartaSans(
+                                            fontSize: 10.5,
+                                            fontWeight: FontWeight.w500,
+                                            color: const Color(0xFF6B6282),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 3),
+                                        Text(
+                                          '${_formatPrice(house.price)} / bulan',
+                                          style: GoogleFonts.plusJakartaSans(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w700,
+                                            color: const Color(0xFF5A31E1),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 6),
+
+                                        Row(
+                                          children: [
+                                            _buildBadge(
+                                              label: 'Evaluasi ✓',
+                                              bgColor: const Color(0xFFD7ECD9),
+                                              textColor: const Color(
+                                                0xFF2E7D32,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 6),
+                                            _buildBadge(
+                                              label: 'Survey ✓',
+                                              bgColor: const Color(0xFFD7ECD9),
+                                              textColor: const Color(
+                                                0xFF2E7D32,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                  Column(
                                     children: [
-                                      Text(
-                                        house['title']!,
-                                        style: GoogleFonts.plusJakartaSans(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w800,
-                                          color: const Color(0xFF241442),
+                                      IconButton(
+                                        onPressed: () => _removeSavedItem(
+                                          house.id,
+                                          house.title,
+                                        ),
+                                        icon: const Icon(
+                                          Icons.delete_outline_rounded,
+                                          color: Color(0xFFE53935),
+                                          size: 20,
                                         ),
                                       ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        house['address']!,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: GoogleFonts.plusJakartaSans(
-                                          fontSize: 10.5,
-                                          fontWeight: FontWeight.w500,
-                                          color: const Color(0xFF555555),
-                                        ),
-                                      ),
-                                      Text(
-                                        house['price']!,
-                                        style: GoogleFonts.plusJakartaSans(
-                                          fontSize: 10.5,
-                                          fontWeight: FontWeight.w600,
-                                          color: const Color(0xFF5A31E1),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 6),
-                                      Row(
-                                        children: [
-                                          _buildBadge(
-                                            'Evaluasi',
-                                            Icons.close_rounded,
-                                            const Color(0xFFF4C2BC),
-                                            const Color(0xFFB71C1C),
-                                          ),
-                                          const SizedBox(width: 6),
-                                          _buildBadge(
-                                            'Survey',
-                                            Icons.check_rounded,
-                                            const Color(0xFFC8E6C9),
-                                            const Color(0xFF2E7D32),
-                                          ),
-                                        ],
+                                      const Icon(
+                                        Icons.chevron_right_rounded,
+                                        color: Color(0xFF43187A),
+                                        size: 22,
                                       ),
                                     ],
                                   ),
-                                ),
-                                const Icon(
-                                  Icons.chevron_right_rounded,
-                                  color: Color(0xFF241442),
-                                  size: 22,
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         );
@@ -212,27 +255,24 @@ class SavedHousingScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBadge(String label, IconData icon, Color bg, Color textCol) {
+  Widget _buildBadge({
+    required String label,
+    required Color bgColor,
+    required Color textColor,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(8),
+        color: bgColor,
+        borderRadius: BorderRadius.circular(6),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            label,
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 9.5,
-              fontWeight: FontWeight.w700,
-              color: textCol,
-            ),
-          ),
-          const SizedBox(width: 3),
-          Icon(icon, size: 11, color: textCol),
-        ],
+      child: Text(
+        label,
+        style: GoogleFonts.plusJakartaSans(
+          fontSize: 9,
+          fontWeight: FontWeight.w700,
+          color: textColor,
+        ),
       ),
     );
   }
