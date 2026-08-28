@@ -208,8 +208,8 @@ class _SelectHousingSurveyScreenState extends State<SelectHousingSurveyScreen> {
                 width: double.infinity,
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
+                  onPressed: () async {
+                    final newJournal = await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => SurveyFormScreen(
@@ -217,6 +217,9 @@ class _SelectHousingSurveyScreenState extends State<SelectHousingSurveyScreen> {
                         ),
                       ),
                     );
+                    if (newJournal != null && context.mounted) {
+                      Navigator.pop(context, newJournal);
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF2B124C),

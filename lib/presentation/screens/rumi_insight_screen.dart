@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../data/mock/survey_journal_store.dart';
 import 'rumi_insight_detail_screen.dart';
 import 'select_housing_survey_screen.dart';
+import 'survey_detail_screen.dart';
 
 class RumiInsightScreen extends StatefulWidget {
-  const RumiInsightScreen({super.key});
+  final bool initialTabJurnal;
+  const RumiInsightScreen({super.key, this.initialTabJurnal = false});
 
   @override
   State<RumiInsightScreen> createState() => _RumiInsightScreenState();
 }
 
 class _RumiInsightScreenState extends State<RumiInsightScreen> {
-  bool _isBelajarTab = true;
+  late bool _isBelajarTab;
   int _selectedCategory = 0;
 
   final List<String> _categories = [
@@ -40,15 +43,81 @@ class _RumiInsightScreenState extends State<RumiInsightScreen> {
     },
   ];
 
-  final List<Map<String, String>> _surveyJournals = [
-    {
-      'title': 'Rumah Kotak',
-      'address': 'Jl. Veteran No.8A, Kota Malang',
-      'date': '27 Agustus 2026',
-      'lastEdited': '2 jam lalu',
-      'image': 'assets/images/rumahKotak.png',
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _isBelajarTab = !widget.initialTabJurnal;
+  }
+
+  Future<void> _navigateToNewJournal() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const SelectHousingSurveyScreen(),
+      ),
+    );
+
+    setState(() {
+      _isBelajarTab = false;
+    });
+  }
+
+  void _showDeleteDialog(int index) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFFFDECE6),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
+          'Hapus Jurnal?',
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 16,
+            fontWeight: FontWeight.w800,
+            color: const Color(0xFF241442),
+          ),
+        ),
+        content: Text(
+          'Apakah kamu yakin ingin menghapus jurnal survei ini?',
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: const Color(0xFF555555),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(
+              'Batal',
+              style: GoogleFonts.plusJakartaSans(
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF555555),
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                SurveyJournalStore.deleteJournal(index);
+              });
+              Navigator.pop(ctx);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFE53935),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: Text(
+              'Hapus',
+              style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -206,7 +275,6 @@ class _RumiInsightScreenState extends State<RumiInsightScreen> {
           ),
         ),
         const SizedBox(height: 16),
-
         ..._modules.map((m) {
           return Container(
             margin: const EdgeInsets.only(bottom: 16),
@@ -326,70 +394,72 @@ class _RumiInsightScreenState extends State<RumiInsightScreen> {
   }
 
   Widget _buildJurnalContent() {
-    if (_surveyJournals.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+    final list = SurveyJournalStore.journals;
+
+    if (list.isEmpty) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Image.asset(
                 'assets/images/rumiInsight.png',
-                height: 180,
+                height: 190,
                 fit: BoxFit.contain,
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Belum Ada Jurnal Survei',
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                  color: const Color(0xFF5B2E91),
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'Yuk tulis jurnal survei untuk mencatat hasil\nkunjunganmu ke suatu hunian!',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w400,
-                  color: const Color(0xFF7E57C2),
-                ),
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                height: 44,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const SelectHousingSurveyScreen(),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.add_rounded, color: Colors.white),
-                  label: Text(
-                    'Tulis Jurnal Baru',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2B124C),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(22),
-                    ),
-                  ),
-                ),
               ),
             ],
           ),
-        ),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Column(
+              children: [
+                Text(
+                  'Belum Ada Jurnal Survei',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF5B2E91),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Yuk tulis jurnal survei untuk mencatat hasil\nkunjunganmu ke suatu hunian!',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w400,
+                    color: const Color(0xFF7E57C2),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  height: 44,
+                  child: ElevatedButton.icon(
+                    onPressed: _navigateToNewJournal,
+                    icon: const Icon(Icons.add_rounded, color: Colors.white),
+                    label: Text(
+                      'Tulis Jurnal Baru',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2B124C),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(22),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       );
     }
 
@@ -399,14 +469,7 @@ class _RumiInsightScreenState extends State<RumiInsightScreen> {
         Align(
           alignment: Alignment.centerRight,
           child: InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const SelectHousingSurveyScreen(),
-                ),
-              );
-            },
+            onTap: _navigateToNewJournal,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
@@ -436,107 +499,142 @@ class _RumiInsightScreenState extends State<RumiInsightScreen> {
           ),
         ),
         const SizedBox(height: 12),
-        ..._surveyJournals.map((j) {
-          return Container(
-            margin: const EdgeInsets.only(bottom: 14),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFDECE6),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(20),
-                      ),
-                      child: Image.asset(
-                        j['image']!,
-                        height: 120,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    Positioned(
-                      top: 10,
-                      left: 10,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFDECE6).withOpacity(0.9),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.calendar_month_rounded,
-                              size: 12,
-                              color: Color(0xFF241442),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              j['date']!,
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+        ...List.generate(list.length, (index) {
+          final j = list[index];
+          return InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SurveyDetailScreen(journal: j),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(14.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              );
+            },
+            borderRadius: BorderRadius.circular(20),
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 14),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFDECE6),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Stack(
                     children: [
-                      Text(
-                        j['title']!,
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w800,
-                          color: const Color(0xFF241442),
+                      ClipRRect(
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(20),
+                        ),
+                        child: Image.asset(
+                          j['image']!,
+                          height: 120,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.location_on_outlined,
-                            size: 13,
-                            color: Color(0xFF555555),
+                      Positioned(
+                        top: 10,
+                        left: 10,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
                           ),
-                          const SizedBox(width: 4),
-                          Text(
-                            j['address']!,
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 10.5,
-                              fontWeight: FontWeight.w500,
-                              color: const Color(0xFF555555),
-                            ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFDECE6).withOpacity(0.9),
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Terakhir diubah: ${j['lastEdited']!}',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 9.5,
-                          fontWeight: FontWeight.w400,
-                          color: const Color(0xFF777777),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.calendar_month_rounded,
+                                size: 12,
+                                color: Color(0xFF241442),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                j['date']!,
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ],
                   ),
-                ),
-              ],
+                  Padding(
+                    padding: const EdgeInsets.all(14.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                j['title']!,
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w800,
+                                  color: const Color(0xFF241442),
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.location_on_outlined,
+                                    size: 13,
+                                    color: Color(0xFF555555),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    j['address']!,
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 10.5,
+                                      fontWeight: FontWeight.w500,
+                                      color: const Color(0xFF555555),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Terakhir diubah: ${j['lastEdited']!}',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 9.5,
+                                  fontWeight: FontWeight.w400,
+                                  color: const Color(0xFF777777),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () => _showDeleteDialog(index),
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFFEBEE),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(
+                              Icons.delete_outline_rounded,
+                              color: Color(0xFFE53935),
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         }),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../data/mock/survey_journal_store.dart';
 
 class SurveyFormScreen extends StatefulWidget {
   final Map<String, String> housing;
@@ -16,17 +18,27 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
   );
   final TextEditingController _notesCtrl = TextEditingController();
 
-  final Map<String, String> _aspectStatus = {
-    'Air & Toilet': 'Aman',
-    'Stopkontak': 'Aman',
-    'Pencahayaan': 'Aman',
-    'Sinyal Seluler': 'Aman',
-    'Kebocoran/Kerusakan': 'Aman',
-    'Ventilasi': 'Aman',
-    'Lingkungan Sekitar': 'Aman',
-  };
-
   bool _isSaved = false;
+
+  void _saveAndShowSummary() {
+    SurveyJournalStore.addJournal({
+      'title': widget.housing['title'] ?? 'Rumah Pilihan',
+      'address': widget.housing['address'] ?? 'Kota Malang',
+      'date': _dateCtrl.text,
+      'notes': _notesCtrl.text.trim(),
+      'lastEdited': 'Baru saja',
+      'image': widget.housing['image'] ?? 'assets/images/rumahKotak.png',
+    });
+
+    setState(() {
+      _isSaved = true;
+    });
+  }
+
+  void _returnToInsight() {
+    int count = 0;
+    Navigator.of(context).popUntil((_) => count++ >= 2);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +96,7 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              widget.housing['title'] ?? 'Rumah Kotak',
+                              widget.housing['title'] ?? 'Rumah Pilihan',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w800,
@@ -93,8 +105,7 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              widget.housing['address'] ??
-                                  'Jl. Veteran No.8A, Kota Malang',
+                              widget.housing['address'] ?? 'Kota Malang',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w500,
@@ -284,9 +295,7 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
                     width: double.infinity,
                     height: 46,
                     child: ElevatedButton(
-                      onPressed: () {
-                        setState(() => _isSaved = true);
-                      },
+                      onPressed: _saveAndShowSummary,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF2B124C),
                         foregroundColor: Colors.white,
@@ -364,7 +373,7 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
               child: Row(
                 children: [
                   IconButton(
-                    onPressed: () => Navigator.pop(context, true),
+                    onPressed: _returnToInsight,
                     icon: const Icon(
                       Icons.arrow_back_rounded,
                       color: Color(0xFF241442),
@@ -396,10 +405,9 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
                   Center(
                     child: Column(
                       children: [
-                        Image.asset(
-                          'assets/images/rumiInsight.png',
+                        SvgPicture.asset(
+                          'assets/images/rumiHepi.svg',
                           height: 120,
-                          fit: BoxFit.contain,
                         ),
                         const SizedBox(height: 12),
                         Text(
@@ -413,7 +421,7 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Yuk lihat ringkasan jurnal surveimu!',
+                          'Yuk lihat ringkasan jurnal survei mu!',
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 11,
                             fontWeight: FontWeight.w400,
@@ -435,7 +443,7 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Hasil Survei – ${widget.housing['title'] ?? 'Rumah Kotak'}',
+                          'Hasil Survei – ${widget.housing['title'] ?? 'Rumah Pilihan'}',
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 14,
                             fontWeight: FontWeight.w800,
@@ -514,9 +522,9 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          _notesCtrl.text.isEmpty
+                          _notesCtrl.text.trim().isEmpty
                               ? 'Mungkin perlu tambah kipas angin besar atau AC'
-                              : _notesCtrl.text,
+                              : _notesCtrl.text.trim(),
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 11,
                             fontWeight: FontWeight.w500,
@@ -524,6 +532,29 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
                           ),
                         ),
                       ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  SizedBox(
+                    width: double.infinity,
+                    height: 46,
+                    child: ElevatedButton(
+                      onPressed: _returnToInsight,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF2B124C),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                      ),
+                      child: Text(
+                        'Kembali',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20),
