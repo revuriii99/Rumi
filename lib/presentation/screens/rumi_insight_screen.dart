@@ -40,7 +40,6 @@ class _RumiInsightScreenState extends State<RumiInsightScreen> {
     },
   ];
 
-  // Ubah list ini untuk mengetes Empty State vs Ada Isi di Tab Jurnal
   final List<Map<String, String>> _surveyJournals = [
     {
       'title': 'Rumah Kotak',
@@ -58,7 +57,6 @@ class _RumiInsightScreenState extends State<RumiInsightScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Top Bar
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 16.0,
@@ -90,7 +88,6 @@ class _RumiInsightScreenState extends State<RumiInsightScreen> {
               ),
             ),
 
-            // Tab Switcher (Belajar / Jurnal Survei)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Container(
@@ -155,7 +152,6 @@ class _RumiInsightScreenState extends State<RumiInsightScreen> {
             ),
             const SizedBox(height: 14),
 
-            // KONTEN TAB
             Expanded(
               child: _isBelajarTab
                   ? _buildBelajarContent()
@@ -167,12 +163,10 @@ class _RumiInsightScreenState extends State<RumiInsightScreen> {
     );
   }
 
-  // 1. TAMPILAN TAB BELAJAR
   Widget _buildBelajarContent() {
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       children: [
-        // Category Chips
         SizedBox(
           height: 34,
           child: ListView.separated(
@@ -213,7 +207,6 @@ class _RumiInsightScreenState extends State<RumiInsightScreen> {
         ),
         const SizedBox(height: 16),
 
-        // List Modul Edukasi
         ..._modules.map((m) {
           return Container(
             margin: const EdgeInsets.only(bottom: 16),
@@ -332,10 +325,8 @@ class _RumiInsightScreenState extends State<RumiInsightScreen> {
     );
   }
 
-  // 2. TAMPILAN TAB JURNAL SURVEI
   Widget _buildJurnalContent() {
     if (_surveyJournals.isEmpty) {
-      // Empty State Tab Jurnal
       return Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -402,7 +393,6 @@ class _RumiInsightScreenState extends State<RumiInsightScreen> {
       );
     }
 
-    // List Jurnal Tersimpan
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       children: [
