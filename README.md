@@ -1,134 +1,116 @@
-# RUMI
+<div align="center">
 
-> **Pahami Perjalanannya, Temukan Tempat Tinggalmu.**
+  <img src="docs/images/app-logo.png" alt="Rumi logo" width="180" />
 
-RUMI adalah aplikasi pendamping yang membantu dewasa muda dalam mencari dan mempertimbangkan tempat tinggal. RUMI tidak hanya membantu pengguna menemukan hunian, tetapi juga memberikan informasi mengenai properti dan keuangan, membantu memahami kemampuan finansial, serta mencatat hasil survei sebelum menentukan pilihan.
+  <p align="center">
+    <img src="docs/images/app-mockup.png" alt="Rumi mockup" width="100%" />
+  </p>
 
-RUMI berfokus pada satu hal: membantu pengguna mengambil keputusan tempat tinggal dengan lebih matang dan terinformasi.
+  # Rumi
 
-## Tentang RUMI
+  Pahami Perjalanannya, Temukan Tempat Tinggalmu: platform cerdas pencarian hunian terintegrasi dengan evaluasi kesehatan finansial.
 
-Mencari tempat tinggal, terutama untuk pertama kalinya, bukan hanya soal menemukan tempat yang terlihat nyaman atau memiliki harga yang menarik.
+  <br />
 
-Ada banyak hal yang perlu dipertimbangkan, seperti:
+  ![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)
+  ![Platform](https://img.shields.io/badge/Platform-iOS-000000?style=for-the-badge&logo=apple&logoColor=white)
+  ![Framework](https://img.shields.io/badge/Framework-Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
+  ![Backend](https://img.shields.io/badge/Backend-Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
 
-* Apakah biaya hunian sesuai dengan kondisi keuangan?
-* Apa saja pengeluaran lain yang perlu diperhitungkan?
-* Apa yang perlu diperhatikan ketika melihat hunian secara langsung?
-* Apa arti istilah seperti KPR, DP, tenor, deposit, atau kontrak sewa?
-* Bagaimana membandingkan beberapa pilihan hunian sebelum menentukan pilihan?
+</div>
 
-RUMI hadir untuk membantu menyederhanakan proses tersebut dalam satu pengalaman yang lebih ringan dan mudah dipahami.
+---
 
-## Perjalanan RUMI
+## Table of contents
 
-RUMI dirancang untuk menemani pengguna melalui lima tahapan:
+- [Project overview](#project-overview)
+- [Key features](#key-features)
+- [Technology stack](#technology-stack)
+- [Project structure](#project-structure)
+- [Team](#team)
 
-**Learn → Discover → Evaluate → Inspect → Decide**
+## Project overview
 
-* **Learn**: memahami hal-hal dasar tentang hunian, properti, dan keuangan.
-* **Discover**: menemukan berbagai pilihan tempat tinggal yang menarik.
-* **Evaluate**: melihat apakah suatu hunian sesuai dengan kondisi keuangan.
-* **Inspect**: mencatat hal-hal penting yang ditemukan saat survei hunian.
-* **Decide**: meninjau kembali pilihan yang tersedia sebelum mengambil keputusan.
+| Item | Details |
+| --- | --- |
+| Application Type | Mobile Application |
+| Primary Platform | Cross-platform (Android & iOS) |
 
-RUMI berfungsi sebagai alat bantu pertimbangan, bukan sebagai pihak yang menentukan pilihan untuk pengguna.
+Rumi adalah aplikasi mobile pencarian dan evaluasi hunian cerdas yang membantu pengguna—khususnya dewasa muda usia 20-an yang sedang mencari hunian pertama—menemukan rumah sewa atau beli yang sesuai dengan kapasitas keuangan mereka, lewat perjalanan Learn → Discover → Evaluate → Inspect → Decide.
 
-## Fitur Utama
+## Key features
 
-### RUMIFinder
+| Feature | What the user can do |
+| --- | --- |
+| RumiInsight (Learn & Inspect) | Mempelajari konsep dasar properti & keuangan lewat modul micro-learning bertone santai, sekaligus menulis Jurnal Survei hasil kunjungan lokasi. |
+| RUMIFinder (Discover) | Menjelajahi katalog hunian secara interaktif dengan swipe kanan untuk menyimpan dan swipe kiri untuk melewati, lengkap detail hunian. |
+| Financial Breathing Room (Evaluate) | Menganalisis Housing Ratio, Sisa Keuangan Bulanan, dan Breathing Room Ratio secara otomatis terhadap harga hunian yang dipilih. |
+| Financial Profile | Mengelola catatan pendapatan, pengeluaran rutin, dan dana darurat sebagai acuan kalkulasi otomatis di seluruh aplikasi. |
+| Profile & Daftar Tersimpan (Decide) | Meninjau ulang seluruh hunian tersimpan beserta hasil evaluasi dan jurnal survei sebagai bahan keputusan akhir. |
+| Authentication | Mendaftar akun baru, login terintegrasi backend, serta mengatur ulang kata sandi dengan alur yang aman. |
 
-RUMIFinder membantu pengguna menjelajahi berbagai pilihan hunian dengan cara yang lebih interaktif.
+## Technology stack
 
-Pengguna dapat melakukan swipe pada pilihan hunian:
+| Category | Technology | Purpose |
+| --- | --- | --- |
+| Frontend | Flutter (Dart) | Framework utama pengembangan antarmuka aplikasi mobile multiplatform |
+| State Management | StatefulBuilder / Built-in State | Manajemen status lokal, gesture interaktif, dan modal dinamis |
+| Backend as a Service | Supabase | Layanan backend terkelola untuk autentikasi dan database realtime |
+| Database | PostgreSQL (Supabase) | Penyimpanan data pengguna, profil finansial, dan properti |
+| Authentication | Supabase Auth | Manajemen session, registrasi, dan login pengguna |
+| UI & Assets | Google Fonts & Flutter SVG | Tipografi Plus Jakarta Sans dan rendering vektor maskot Rumi |
 
-* **Swipe kiri** untuk melewati hunian.
-* **Swipe kanan** untuk menyimpan hunian yang menarik.
+## Project structure
 
-Pengguna juga dapat melihat informasi lebih lanjut mengenai hunian sebelum memutuskan apakah ingin menyimpannya atau mengevaluasi kondisi finansialnya.
+```text
+lib/
+├── core/                   # Utility inti, transisi halaman, dan route aplikasi
+├── data/
+│   ├── mock/               # Mock data properti hunian dan penyimpanan lokal
+│   └── repositories/       # Integrasi database dan repository Supabase
+├── presentation/
+│   ├── screens/            # Layar antarmuka (Auth, Home, RumiFinder, Profile, Detail)
+│   └── widgets/            # Reusable UI widgets dan kartu komponen
+└── main.dart               # Entry point dan inisialisasi konfigurasi aplikasi
+assets/                     # Images and other static assets
+pubspec.yaml                # Project dependencies
+```
 
-### RumiInsight
+## Getting Started
 
-RumiInsight merupakan bagian edukasi RUMI yang membantu pengguna mempelajari berbagai hal mengenai tempat tinggal, properti, dan keuangan.
+To get a local copy up and running, follow these simple steps.
 
-Materinya mencakup:
+### Prerequisites
 
-* Mencari tempat tinggal
-* Keuangan untuk hunian
-* KPR dan cicilan
-* Menabung untuk hunian
-* Sewa dan kontrak hunian
+*   Flutter SDK installed on your machine.
+*   An editor like VS Code or Android Studio.
 
-Materi dibuat dengan bahasa yang santai dan mudah dipahami agar topik properti dan keuangan tidak terasa terlalu rumit.
+### Installation
 
-### Financial Breathing Room
+1.  **Clone the repo**
+    ```sh
+    git clone https://github.com/revuriii99/rumi.git
+    ```
+2.  **Navigate to the project directory**
+    ```sh
+    cd rumi
+    ```
+3.  **Install dependencies**
+    ```sh
+    flutter pub get
+    ```
+4.  **Run the app**
+    ```sh
+    flutter run
+    ```
 
-Financial Breathing Room membantu pengguna melihat bagaimana biaya sebuah hunian dapat memengaruhi kondisi keuangan bulanannya.
-
-RUMI menggunakan informasi seperti pendapatan, pengeluaran rutin, tabungan, dan biaya hunian untuk memberikan gambaran mengenai kondisi keuangan pengguna.
-
-Hasil evaluasi dibagi menjadi tiga kondisi:
-
-* **Hijau**: Relatif Aman
-* **Kuning**: Perlu Perhatian
-* **Merah**: Tekanan Tinggi
-
-### Jurnal Survei
-
-Jurnal Survei memungkinkan pengguna mencatat hasil ketika melakukan survei hunian.
-
-Catatan dapat mencakup:
-
-* Kondisi air dan toilet
-* Stopkontak
-* Pencahayaan
-* Sinyal
-* Kebocoran atau kerusakan
-* Ventilasi
-* Kondisi lingkungan sekitar
-
-Pengguna juga dapat menambahkan catatan pribadi dan foto sebagai dokumentasi.
-
-### Daftar Tersimpan
-
-Hunian yang menarik dapat disimpan untuk dilihat kembali.
-
-Daftar Tersimpan membantu pengguna mengumpulkan beberapa pilihan sebelum membandingkan dan mempertimbangkannya lebih lanjut.
-
-## Tujuan RUMI
-
-RUMI dibuat untuk membantu menjawab beberapa pertanyaan yang sering muncul ketika seseorang mulai mencari tempat tinggal:
-
-> "Saya harus mulai dari mana?"
-
-> "Apakah tempat ini sesuai dengan kondisi keuangan saya?"
-
-> "Apa saja yang harus saya periksa?"
-
-> "Apakah saya benar-benar memahami pilihan yang akan saya ambil?"
-
-Dengan menggabungkan pencarian hunian, edukasi, pertimbangan finansial, dan pencatatan survei, RUMI ingin membuat proses mencari tempat tinggal menjadi lebih terarah, informatif, dan menyenangkan.
-
-## Project Status
-
-**Status: In Development**
-
-RUMI saat ini masih berada pada tahap awal pengembangan. Repository ini menjadi tempat untuk menyimpan dan mengembangkan project RUMI seiring proses desain dan pengembangannya berjalan.
-
-Desain aplikasi, teknologi yang digunakan, dan struktur aplikasi masih dalam tahap pengembangan dan akan ditentukan seiring berjalannya project.
+---
 
 ## Team
 
-| Role            | Name         |
-| --------------- | ------------ |
-| Product Manager | Amelia Raisa |
-| UI/UX Designer  | Salsabila    |
-| UI/UX Designer  | Scar         |
-| Mobile Engineer | Vincent      |
-
-## Documentation
-
-Dokumentasi produk RUMI mencakup konsep, permasalahan pengguna, kebutuhan, fitur, user flow, dan ruang lingkup MVP.
-
-> **RUMI**
-> *Pahami Perjalanannya, Temukan Tempat Tinggalmu.*
+| Name | Role | Responsibilities | Contact |
+| --- | --- | --- | --- |
+| Amelia Raisa | Product Manager | Merumuskan problem statement, solution, dan scope MVP, menyusun PRD & user flow, serta mengawasi timeline dan progres tim | LinkedIn |
+| Salsabila | UI/UX Designer | Merancang design system, wireframe, dan prototype high-fidelity di Figma | LinkedIn |
+| Scar | UI/UX Designer | Merancang design system, wireframe, dan prototype high-fidelity di Figma | LinkedIn |
+| Vincent (Revi) | Mobile Engineer | Mengembangkan antarmuka aplikasi, integrasi fitur RUMIFinder, kalkulasi Financial Breathing Room, dan konektivitas Supabase | [GitHub](https://github.com/revuriii99) |

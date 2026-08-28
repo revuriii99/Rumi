@@ -4,8 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/app_page_route.dart';
 import '../../data/repositories/auth_repository.dart';
-import 'register_success_screen.dart';
+import 'change_password_screen.dart';
 import 'main_navigation_screen.dart';
+import 'register_success_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   final bool isRegisterInitial;
@@ -79,7 +80,6 @@ class _AuthScreenState extends State<AuthScreen> {
 
         if (!mounted) return;
 
-        // Navigasi ke Onboarding Profil Finansial
         Navigator.pushReplacement(
           context,
           SmoothPageRoute(page: const RegisterSuccessScreen()),
@@ -91,7 +91,6 @@ class _AuthScreenState extends State<AuthScreen> {
 
         if (!mounted) return;
 
-        // Navigasi langsung ke Dashboard Utama
         Navigator.pushAndRemoveUntil(
           context,
           SmoothPageRoute(page: const MainNavigationScreen()),
@@ -337,48 +336,96 @@ class _AuthScreenState extends State<AuthScreen> {
                                           duration: const Duration(
                                             milliseconds: 200,
                                           ),
-                                          child: Row(
-                                            key: ValueKey<bool>(isRegister),
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Text(
-                                                isRegister
-                                                    ? 'Sudah Punya akun? '
-                                                    : 'Belum Punya akun? ',
-                                                style:
-                                                    GoogleFonts.plusJakartaSans(
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: const Color(
-                                                        0xFF282828,
+                                          child: isRegister
+                                              ? Row(
+                                                  key: const ValueKey<String>(
+                                                    'register_bottom_text',
+                                                  ),
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    Text(
+                                                      'Sudah Punya akun? ',
+                                                      style:
+                                                          GoogleFonts.plusJakartaSans(
+                                                            fontSize: 12,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            color: const Color(
+                                                              0xFF282828,
+                                                            ),
+                                                          ),
+                                                    ),
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        setState(
+                                                          () => isRegister =
+                                                              false,
+                                                        );
+                                                      },
+                                                      child: Text(
+                                                        'Masuk di Sini',
+                                                        style:
+                                                            GoogleFonts.plusJakartaSans(
+                                                              fontSize: 12,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                              color:
+                                                                  const Color(
+                                                                    0xFF1976D2,
+                                                                  ),
+                                                            ),
                                                       ),
                                                     ),
-                                              ),
-                                              GestureDetector(
-                                                onTap: () {
-                                                  setState(
-                                                    () => isRegister =
-                                                        !isRegister,
-                                                  );
-                                                },
-                                                child: Text(
-                                                  isRegister
-                                                      ? 'Masuk di Sini'
-                                                      : 'Daftar di Sini',
-                                                  style:
-                                                      GoogleFonts.plusJakartaSans(
-                                                        fontSize: 12,
-                                                        fontWeight:
-                                                            FontWeight.w700,
-                                                        color: const Color(
-                                                          0xFF1976D2,
-                                                        ),
+                                                  ],
+                                                )
+                                              : Row(
+                                                  key: const ValueKey<String>(
+                                                    'login_bottom_text',
+                                                  ),
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    Text(
+                                                      'Lupa Kata Sandi? ',
+                                                      style:
+                                                          GoogleFonts.plusJakartaSans(
+                                                            fontSize: 12,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            color: const Color(
+                                                              0xFF282828,
+                                                            ),
+                                                          ),
+                                                    ),
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        Navigator.push(
+                                                          context,
+                                                          SmoothPageRoute(
+                                                            page:
+                                                                const ChangePasswordScreen(),
+                                                          ),
+                                                        );
+                                                      },
+                                                      child: Text(
+                                                        'Ubah Kata Sandi',
+                                                        style:
+                                                            GoogleFonts.plusJakartaSans(
+                                                              fontSize: 12,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                              color:
+                                                                  const Color(
+                                                                    0xFF1976D2,
+                                                                  ),
+                                                            ),
                                                       ),
+                                                    ),
+                                                  ],
                                                 ),
-                                              ),
-                                            ],
-                                          ),
                                         ),
                                       ),
                                       const SizedBox(height: 12),
