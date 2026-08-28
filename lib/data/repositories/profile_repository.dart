@@ -90,4 +90,20 @@ class ProfileRepository {
       ...data,
     });
   }
+
+  Future<void> saveFinancialProfile(Map<String, dynamic> data) async {
+    final user = _supabase.auth.currentUser;
+    if (user == null) return;
+
+    await _supabase.from('financial_profiles').upsert({
+      'user_id': user.id,
+      'monthly_income': data['monthly_income'] ?? 0,
+      'transportation': data['transportation'] ?? 0,
+      'daily_needs': data['daily_needs'] ?? 0,
+      'routine_bills': data['routine_bills'] ?? 0,
+      'savings_target': data['savings_target'] ?? 0,
+      'other_expenses': data['other_expenses'] ?? 0,
+      'updated_at': DateTime.now().toIso8601String(),
+    });
+  }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/app_page_route.dart';
 import 'survey_form_screen.dart';
 
 class SelectHousingSurveyScreen extends StatefulWidget {
@@ -71,21 +73,27 @@ class _SelectHousingSurveyScreenState extends State<SelectHousingSurveyScreen> {
                 ],
               ),
             ),
+
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  Stack(
+                    clipBehavior: Clip.none,
                     children: [
-                      Expanded(
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          right: 90.0,
+                          top: 8.0,
+                          bottom: 8.0,
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               'Pilih Hunian',
                               style: GoogleFonts.plusJakartaSans(
-                                fontSize: 20,
+                                fontSize: 22,
                                 fontWeight: FontWeight.w800,
                                 color: const Color(0xFF241442),
                               ),
@@ -94,29 +102,35 @@ class _SelectHousingSurveyScreenState extends State<SelectHousingSurveyScreen> {
                             Text(
                               'Hunian mana yang ingin kamu tulis jurnal survei nya?',
                               style: GoogleFonts.plusJakartaSans(
-                                fontSize: 11,
+                                fontSize: 11.5,
                                 fontWeight: FontWeight.w500,
                                 color: const Color(0xFF555555),
+                                height: 1.3,
                               ),
                             ),
                           ],
                         ),
                       ),
-                      Image.asset(
-                        'assets/images/rumiNgoding.png',
-                        height: 70,
-                        fit: BoxFit.contain,
+                      Positioned(
+                        right: -10,
+                        top: -12,
+                        child: SvgPicture.asset(
+                          'assets/images/rumiObservatif.svg',
+                          height: 105,
+                          fit: BoxFit.contain,
+                        ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 20),
+
                   ...List.generate(_savedHousings.length, (index) {
                     final h = _savedHousings[index];
                     final isSelected = _selectedIndex == index;
                     return GestureDetector(
                       onTap: () => setState(() => _selectedIndex = index),
                       child: Container(
-                        margin: const EdgeInsets.only(bottom: 12),
+                        margin: const EdgeInsets.only(bottom: 14),
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: const Color(0xFFB5A4DD),
@@ -134,8 +148,8 @@ class _SelectHousingSurveyScreenState extends State<SelectHousingSurveyScreen> {
                               borderRadius: BorderRadius.circular(12),
                               child: Image.asset(
                                 h['image']!,
-                                width: 70,
-                                height: 70,
+                                width: 72,
+                                height: 72,
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -199,6 +213,7 @@ class _SelectHousingSurveyScreenState extends State<SelectHousingSurveyScreen> {
                 ],
               ),
             ),
+
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 20.0,
@@ -208,18 +223,15 @@ class _SelectHousingSurveyScreenState extends State<SelectHousingSurveyScreen> {
                 width: double.infinity,
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: () async {
-                    final newJournal = await Navigator.push(
+                  onPressed: () {
+                    Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => SurveyFormScreen(
+                      SmoothPageRoute(
+                        page: SurveyFormScreen(
                           housing: _savedHousings[_selectedIndex],
                         ),
                       ),
                     );
-                    if (newJournal != null && context.mounted) {
-                      Navigator.pop(context, newJournal);
-                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF2B124C),

@@ -9,7 +9,9 @@ import 'rumi_insight_detail_screen.dart';
 import '../../core/app_page_route.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final VoidCallback? onNavigateToFinder;
+
+  const HomeScreen({super.key, this.onNavigateToFinder});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -48,40 +50,65 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  String _formatRupiah(int val) {
+    final isNegative = val < 0;
+    final absVal = val.abs();
+    final str = absVal.toString().replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (m) => '${m[1]}.',
+    );
+    return isNegative ? '-Rp$str' : 'Rp$str';
+  }
+
   @override
   Widget build(BuildContext context) {
-    final int income = _financialData?['monthly_income'] ?? 5000000;
-    const int sampleHousePrice = 1500000;
-
+    // 1. Data Finansial dari database
+    final int income = _financialData?['monthly_income'] ?? 0;
     final int transport = _financialData?['transportation'] ?? 0;
     final int daily = _financialData?['daily_needs'] ?? 0;
     final int bills = _financialData?['routine_bills'] ?? 0;
     final int savings = _financialData?['savings_target'] ?? 0;
     final int other = _financialData?['other_expenses'] ?? 0;
 
-    final int totalExpenses = transport + daily + bills + savings + other;
-    final int remainingMoney = income - (sampleHousePrice + totalExpenses);
+    // 2. Perhitungan Dinamis (Rasio Sehat 30% untuk Budget Hunian)
+    final int maxHousingBudget = (income * 0.30).round();
+    final int totalLivingExpenses = transport + daily + bills + savings + other;
+    final int remainingMoney =
+        income - (maxHousingBudget + totalLivingExpenses);
 
     final double housingRatio = income > 0
-        ? (sampleHousePrice / income) * 100
-        : 0;
-    final double dsrRatio = income > 0 ? (remainingMoney / income) * 100 : 0;
+        ? (maxHousingBudget / income) * 100
+        : 0.0;
+    final double dsrRatio = income > 0
+        ? ((maxHousingBudget + bills) / income) * 100
+        : 0.0;
 
-    Color statusBgColor = const Color(0xFFFBE7BE);
-    Color statusTextColor = const Color(0xFF9E6500);
-    Color statusDotColor = const Color(0xFFE89A00);
-    String statusText = 'KUNING: Perlu Perhatian';
+    // 3. Status Evaluasi Keuangan
+    Color statusBgColor;
+    Color statusTextColor;
+    Color statusDotColor;
+    String statusText;
 
-    if (housingRatio <= 30 && dsrRatio >= 20) {
+    if (income == 0) {
+      statusBgColor = const Color(0xFFFBE7BE);
+      statusTextColor = const Color(0xFF9E6500);
+      statusDotColor = const Color(0xFFE89A00);
+      statusText = 'KUNING: Belum Ada Data';
+    } else if (remainingMoney >= (income * 0.20) && dsrRatio <= 40) {
       statusBgColor = const Color(0xFFC8E6C9);
       statusTextColor = const Color(0xFF2E7D32);
       statusDotColor = const Color(0xFF4CAF50);
       statusText = 'HIJAU: Keuangan Aman';
-    } else if (housingRatio > 35 || remainingMoney < 0) {
+    } else if (remainingMoney < 0 || dsrRatio > 50) {
       statusBgColor = const Color(0xFFFFCDD2);
       statusTextColor = const Color(0xFFC62828);
       statusDotColor = const Color(0xFFE53935);
       statusText = 'MERAH: Beban Tinggi';
+    } else {
+      statusBgColor = const Color(0xFFFBE7BE);
+      statusTextColor = const Color(0xFF9E6500);
+      statusDotColor = const Color(0xFFE89A00);
+      statusText = 'KUNING: Perlu Perhatian';
     }
 
     return Scaffold(
@@ -118,6 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 18),
 
+                    // Card Dukungan Keuangan Dinamis
                     Stack(
                       clipBehavior: Clip.none,
                       children: [
@@ -174,10 +202,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 text: TextSpan(
                                   children: [
                                     TextSpan(
-                                      text:
-                                          'Rp${sampleHousePrice.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')}',
+                                      text: _formatRupiah(maxHousingBudget),
                                       style: GoogleFonts.plusJakartaSans(
-                                        fontSize: 16,
+                                        fontSize: 18,
                                         fontWeight: FontWeight.w800,
                                         color: const Color(0xFF5A31E1),
                                       ),
@@ -207,11 +234,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   const SizedBox(width: 8),
                                   Expanded(
+                                    flex: 2,
                                     child: _buildMiniStat(
                                       title: 'Sisa Keuangan',
-                                      value:
-                                          'Rp${remainingMoney.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')}',
-                                      valueColor: const Color(0xFF241442),
+                                      value: _formatRupiah(remainingMoney),
+                                      valueColor: remainingMoney < 0
+                                          ? const Color(0xFFE53935)
+                                          : const Color(0xFF241442),
                                     ),
                                   ),
                                   const SizedBox(width: 8),
@@ -219,67 +248,41 @@ class _HomeScreenState extends State<HomeScreen> {
                                     child: _buildMiniStat(
                                       title: 'DSR',
                                       value: '${dsrRatio.toStringAsFixed(0)}%',
-                                      valueColor: const Color(0xFF2E7D32),
+                                      valueColor: dsrRatio > 40
+                                          ? const Color(0xFFE53935)
+                                          : const Color(0xFF2E7D32),
                                     ),
                                   ),
                                 ],
                               ),
                               const SizedBox(height: 18),
 
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: OutlinedButton(
-                                      onPressed: () {},
-                                      style: OutlinedButton.styleFrom(
-                                        side: const BorderSide(
-                                          color: Color(0xFF43187A),
-                                          width: 1.5,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            20,
-                                          ),
-                                        ),
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 10,
-                                        ),
+                              Center(
+                                child: TextButton(
+                                  onPressed: () async {
+                                    final updated = await Navigator.push(
+                                      context,
+                                      SmoothPageRoute(
+                                        page: const FinancialProfileScreen(),
                                       ),
-                                      child: Text(
-                                        'Ganti Hunian',
-                                        style: GoogleFonts.plusJakartaSans(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w700,
-                                          color: const Color(0xFF43187A),
-                                        ),
-                                      ),
+                                    );
+                                    if (updated == true) _loadDashboardData();
+                                  },
+                                  style: TextButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 24,
+                                      vertical: 8,
                                     ),
                                   ),
-                                  const SizedBox(width: 14),
-                                  Expanded(
-                                    child: TextButton(
-                                      onPressed: () async {
-                                        final updated = await Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                const FinancialProfileScreen(),
-                                          ),
-                                        );
-                                        if (updated == true)
-                                          _loadDashboardData();
-                                      },
-                                      child: Text(
-                                        'Lihat Detail',
-                                        style: GoogleFonts.plusJakartaSans(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w700,
-                                          color: const Color(0xFF43187A),
-                                        ),
-                                      ),
+                                  child: Text(
+                                    'Lihat Detail',
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.w700,
+                                      color: const Color(0xFF43187A),
                                     ),
                                   ),
-                                ],
+                                ),
                               ),
                             ],
                           ),
@@ -288,14 +291,16 @@ class _HomeScreenState extends State<HomeScreen> {
                           top: -16,
                           right: 4,
                           child: SvgPicture.asset(
-                            'assets/images/rumiObservatif.svg',
-                            height: 100,
+                            'assets/images/maskotRumi.svg',
+                            height: 105,
+                            fit: BoxFit.contain,
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 20),
 
+                    // Banner Ungu Eksplorasi Hunian
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(20),
@@ -329,7 +334,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             width: double.infinity,
                             height: 42,
                             child: ElevatedButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                widget.onNavigateToFinder?.call();
+                              },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFFFDECE6),
                                 foregroundColor: const Color(0xFF381566),
@@ -393,8 +400,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => const RumiInsightDetailScreen(
+                          SmoothPageRoute(
+                            page: const RumiInsightDetailScreen(
                               title: 'KPR Tanpa Bikin Pusing Keliling',
                               category: 'KPR',
                               readTime: '3 menit baca',
@@ -416,8 +423,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => const RumiInsightDetailScreen(
+                          SmoothPageRoute(
+                            page: const RumiInsightDetailScreen(
                               title: 'Nabung Buat DP, Bukan Nahan Ngopi',
                               category: 'Mencari Hunian',
                               readTime: '3 menit baca',

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../screens/home_screen.dart';
+import '../screens/rumi_finder_screen.dart';
 import '../screens/profile_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
@@ -21,50 +22,63 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     _currentIndex = widget.initialIndex;
   }
 
-  final List<Widget> _pages = [
-    const HomeScreen(),
-    const Scaffold(
-      backgroundColor: Color(0xFFD8CAF6),
-      body: SafeArea(
-        child: Center(
-          child: Text(
-            'RUMIFinder Screen\n(Swipe Card Discover)',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF241442),
-            ),
-          ),
-        ),
-      ),
-    ),
-    const ProfileScreen(),
-  ];
+  void _switchToFinder() {
+    setState(() {
+      _currentIndex = 1;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> pages = [
+      HomeScreen(onNavigateToFinder: _switchToFinder),
+      const RumiFinderScreen(),
+      const ProfileScreen(),
+    ];
+
     return Scaffold(
-      body: IndexedStack(index: _currentIndex, children: _pages),
+      backgroundColor: const Color(0xFFD8CAF6),
+      body: IndexedStack(index: _currentIndex, children: pages),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFFF3EDFD),
+          color: const Color(0xFFEDE4FB),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           border: Border(
             top: BorderSide(
-              color: const Color(0xFFB5A4DD).withOpacity(0.4),
-              width: 1,
+              color: const Color(0xFFB5A4DD).withOpacity(0.5),
+              width: 1.2,
             ),
           ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF241442).withOpacity(0.04),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
         ),
         child: SafeArea(
+          top: false,
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildNavItem(0, 'assets/icons/home.svg', 'Beranda'),
-                _buildNavItem(1, 'assets/icons/rumiFinder.svg', 'RumiFinder'),
-                _buildNavItem(2, 'assets/icons/profile.svg', 'Profil'),
+                _buildNavItem(
+                  index: 0,
+                  iconPath: 'assets/icons/home.svg',
+                  label: 'Beranda',
+                ),
+                _buildNavItem(
+                  index: 1,
+                  iconPath: 'assets/icons/rumiFinder.svg',
+                  label: 'RumiFinder',
+                ),
+                _buildNavItem(
+                  index: 2,
+                  iconPath: 'assets/icons/profile.svg',
+                  label: 'Profil',
+                ),
               ],
             ),
           ),
@@ -73,33 +87,42 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
 
-  Widget _buildNavItem(int index, String iconPath, String label) {
+  Widget _buildNavItem({
+    required int index,
+    required String iconPath,
+    required String label,
+  }) {
     final bool isSelected = _currentIndex == index;
-    final Color color = isSelected
-        ? const Color(0xFF381566)
-        : const Color(0xFF8E82A8);
+    final Color itemColor = isSelected
+        ? const Color(0xFF2B124C)
+        : const Color(0xFF7E729C);
 
     return InkWell(
       onTap: () => setState(() => _currentIndex = index),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SvgPicture.asset(
-            iconPath,
-            height: 22,
-            width: 22,
-            colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 11,
-              fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
-              color: color,
+      splashColor: Colors.transparent,
+      highlightColor: Colors.transparent,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SvgPicture.asset(
+              iconPath,
+              height: 24,
+              width: 24,
+              colorFilter: ColorFilter.mode(itemColor, BlendMode.srcIn),
             ),
-          ),
-        ],
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
+                color: itemColor,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

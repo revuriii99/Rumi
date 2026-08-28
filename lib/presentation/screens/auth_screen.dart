@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../core/app_page_route.dart';
 import '../../data/repositories/auth_repository.dart';
 import 'register_success_screen.dart';
-import 'main_navigation_screen.dart'; // Import Main Navigation
+import 'main_navigation_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   final bool isRegisterInitial;
@@ -78,11 +79,10 @@ class _AuthScreenState extends State<AuthScreen> {
 
         if (!mounted) return;
 
+        // Navigasi ke Onboarding Profil Finansial
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (context) => const RegisterSuccessScreen(),
-          ),
+          SmoothPageRoute(page: const RegisterSuccessScreen()),
         );
       } else {
         await _authRepository
@@ -91,10 +91,10 @@ class _AuthScreenState extends State<AuthScreen> {
 
         if (!mounted) return;
 
-        // Navigasi langsung ke Home Screen / Main Navigation
+        // Navigasi langsung ke Dashboard Utama
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => const MainNavigationScreen()),
+          SmoothPageRoute(page: const MainNavigationScreen()),
           (route) => false,
         );
       }

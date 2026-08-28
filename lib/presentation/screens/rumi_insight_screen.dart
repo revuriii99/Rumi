@@ -447,70 +447,65 @@ class _RumiInsightScreenState extends State<RumiInsightScreen> {
     final list = SurveyJournalStore.journals;
 
     if (list.isEmpty) {
-      return Column(
-        key: const ValueKey('EmptyJurnal'),
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+      return Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Column(
+            key: const ValueKey('EmptyJurnal'),
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Image.asset(
-                'assets/images/rumiInsight.png',
-                height: 190,
+                'assets/images/rumiMikir.png',
+                height: 180,
                 fit: BoxFit.contain,
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Belum Ada Jurnal Survei',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: const Color(0xFF5B2E91),
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'Yuk tulis jurnal survei untuk mencatat hasil\nkunjunganmu ke suatu hunian!',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w400,
+                  color: const Color(0xFF7E57C2),
+                ),
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                height: 44,
+                child: ElevatedButton.icon(
+                  onPressed: _navigateToNewJournal,
+                  icon: const Icon(Icons.add_rounded, color: Colors.white),
+                  label: Text(
+                    'Tulis Jurnal Baru',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2B124C),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(22),
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Column(
-              children: [
-                Text(
-                  'Belum Ada Jurnal Survei',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    color: const Color(0xFF5B2E91),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Yuk tulis jurnal survei untuk mencatat hasil\nkunjunganmu ke suatu hunian!',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w400,
-                    color: const Color(0xFF7E57C2),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  height: 44,
-                  child: ElevatedButton.icon(
-                    onPressed: _navigateToNewJournal,
-                    icon: const Icon(Icons.add_rounded, color: Colors.white),
-                    label: Text(
-                      'Tulis Jurnal Baru',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2B124C),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(22),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+        ),
       );
     }
 

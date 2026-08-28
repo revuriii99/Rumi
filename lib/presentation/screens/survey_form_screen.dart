@@ -117,7 +117,7 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
                       ),
                       Image.asset(
                         'assets/images/rumiNgoding.png',
-                        height: 70,
+                        height: 100,
                         fit: BoxFit.contain,
                       ),
                     ],
